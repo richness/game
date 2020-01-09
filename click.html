@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html,body,.wrap{
+        width: 100%;
+        height: 100%;
+    }
+    .wrap{
+        display: flex;
+        flex-direction: column;
+    }
+    .rowName{
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+    }
+    .innerName{
+        flex: 1;
+        border: 1px solid #000;
+    }
+    #count{
+        width: 100%;
+        height: 80px;
+        line-height: 80px;
+        text-align: center;
+    }
+
+</style>
+<body>
+<div id="count">
+    点击数：<span></span>
+</div>
+<div class="wrap">
+
+</div>
+<script>
+    function Game(wrap) {
+        this.rows=8;
+        this.columns=5;
+        this.datagrid=[];
+        this.wrap=wrap;
+        this.blackList=[];
+        this.count=0;
+
+    }
+    Game.prototype={
+        constructor:Game,
+        createElements:function () {
+            for(var i=0;i<this.rows;i++){
+                var rowDiv=document.createElement("div");
+                rowDiv.className="rowName";
+                this.datagrid.push([]);
+                var r=this.random();
+                for (var j=0;j<this.columns;j++){
+                    var innerDiv=document.createElement("div");
+                    innerDiv.className="innerName";
+                    if(j==r){
+                        innerDiv.style.background="#000";
+                        this.blackList.unshift(innerDiv);
+                    }else {
+                        innerDiv.style.background="#fff";
+                    }
+                    rowDiv.append(innerDiv);
+                    this.datagrid[i].push(innerDiv)
+                }
+                this.wrap.append(rowDiv);
+            }
+
+        },
+        random:function () {
+            var that=this;
+            return Math.floor(Math.random()*that.columns);
+        },
+        addBlackEvent:function () {
+            var that=this;
+            if (that.blackList.length == 0) {
+                return
+            }
+            var newRandom=that.random();
+            var count=document.querySelector("#count span");
+            for (var key in that.blackList){
+                that.blackList[key].onclick = function () {
+                this.style.background = "#fff";
+                that.blackList.shift();
+                that.count++;
+                count.innerHTML=that.count;
+                var newBlackDiv=this.parentNode.children[newRandom];
+                newBlackDiv.style.background="#000";
+                that.blackList.push(newBlackDiv);
+                that.addBlackEvent();
+            }
+        }
+        }
+    };
+    window.onload=function (ev) {
+        var wrap=document.querySelector(".wrap");
+         var game=new Game(wrap);
+         game.createElements();
+         game.addBlackEvent();
+
+    }
+</script>
+
+</body>
+</html>
